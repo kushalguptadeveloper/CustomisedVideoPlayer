@@ -70,7 +70,8 @@ CountDownTimer countDownTimer;
         try {
 
             player.setAudioStreamType(AudioManager.STREAM_MUSIC);
-            player.setDataSource(this, Uri.parse("http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4"));
+
+           player.setDataSource(this, Uri.parse("http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4"));
             player.setOnPreparedListener(this);
 
         } catch (IllegalArgumentException e) {
@@ -185,6 +186,22 @@ CountDownTimer countDownTimer;
         controller.setMediaPlayer(this);
         controller.setAnchorView((FrameLayout) findViewById(R.id.videoSurfaceContainer));
         player.start();
+        countDownTimer = new CountDownTimer(getDuration(), 1000) {                     //geriye sayma
+
+            public void onTick(long millisUntilFinished) {
+
+                NumberFormat f = new DecimalFormat("00");
+                long hour = (millisUntilFinished / 3600000) % 24;
+                long min = (millisUntilFinished / 60000) % 60;
+                long sec = (millisUntilFinished / 1000) % 60;
+
+                dura.setText(f.format(hour) + ":" + f.format(min) + ":" + f.format(sec));
+            }
+
+            public void onFinish() {
+                dura.setText("00:00:00");
+            }
+        }.start();
     }
 // End MediaPlayer.OnPreparedListener
 
@@ -240,6 +257,7 @@ CountDownTimer countDownTimer;
     @Override
     public void start() {
         player.start();
+        dura.setVisibility(View.VISIBLE);
 
         countDownTimer = new CountDownTimer(screenTime, 1000) {                     //geriye sayma
 
@@ -272,7 +290,6 @@ CountDownTimer countDownTimer;
     @Override
     public void setOnScreenTime(int time){
        // dura.setText(time);
-dura.setVisibility(View.VISIBLE);
         screenTime=time;
 
 
