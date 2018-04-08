@@ -70,9 +70,11 @@ CountDownTimer countDownTimer;
         try {
 
             player.setAudioStreamType(AudioManager.STREAM_MUSIC);
+            // player.setDataSource(this, Uri.parse("http://dl1.n3.23.cdn.perfectgirls.net/mp4/-h29-35Ni7qOjZT7hZGzdA==,1523201699/525/011/525011-full.mp4"));
 
            player.setDataSource(this, Uri.parse("http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4"));
             player.setOnPreparedListener(this);
+
 
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
@@ -246,6 +248,11 @@ CountDownTimer countDownTimer;
 
     @Override
     public void pause() {
+
+        dura.setVisibility(View.INVISIBLE);
+        if(countDownTimer !=null){
+            countDownTimer.cancel();
+        }
         player.pause();
     }
 
@@ -256,6 +263,7 @@ CountDownTimer countDownTimer;
 
     @Override
     public void start() {
+        //https://drive.google.com/file/d/19-QXY7dFSHGzDMgmQ2KFQnySfGznjnC1/view?usp=sharing
         player.start();
         dura.setVisibility(View.VISIBLE);
 
@@ -290,13 +298,40 @@ CountDownTimer countDownTimer;
     @Override
     public void setOnScreenTime(int time){
        // dura.setText(time);
-        screenTime=time;
+        screenTime=time+1000;
 
+
+    }
+    @Override
+    public void nextVideo(){
+        if(player !=null){
+            player.stop();
+
+            try {
+
+                player.setAudioStreamType(AudioManager.STREAM_MUSIC);
+                // player.setDataSource(this, Uri.parse("http://dl1.n3.23.cdn.perfectgirls.net/mp4/-h29-35Ni7qOjZT7hZGzdA==,1523201699/525/011/525011-full.mp4"));
+
+                 player.setDataSource(this, Uri.parse("http://dl1.n3.23.cdn.perfectgirls.net/mp4/-h29-35Ni7qOjZT7hZGzdA==,1523201699/525/011/525011-full.mp4"));
+                player.setOnPreparedListener(this);
+
+
+            } catch (IllegalArgumentException e) {
+                e.printStackTrace();
+            } catch (SecurityException e) {
+                e.printStackTrace();
+            } catch (IllegalStateException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        }
 
     }
 
 
 
 // End VideoMediaController.MediaPlayerControl
-}
+
 
