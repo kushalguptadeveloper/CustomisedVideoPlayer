@@ -1,6 +1,7 @@
 package com.example.kushalgupta.customisedvideoplayer;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -30,9 +31,9 @@ import java.util.Locale;
 public class VideoPlayerActivity extends Activity implements SurfaceHolder.Callback, MediaPlayer.OnPreparedListener, VideoControllerView.MediaPlayerControl {
 
     SurfaceView videoSurface;
-    MediaPlayer player, player2;
+    MediaPlayer player,player2;
     VideoControllerView controller;
-    TextView dura;
+    TextView dura,dura2;
     private ProgressBar screenProgress;
     private Boolean mDragging;
     StringBuilder mFormatBuilder;
@@ -41,12 +42,14 @@ public class VideoPlayerActivity extends Activity implements SurfaceHolder.Callb
     int screenTime;
     CountDownTimer countDownTimer;
 public static final String TAG = "chla";
+ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video_player);
         dura = findViewById(R.id.duration);
+        dura2 = findViewById(R.id.duration2);
 
         videoSurface = (SurfaceView) findViewById(R.id.videoSurface);
         SurfaceHolder videoHolder = videoSurface.getHolder();
@@ -118,12 +121,15 @@ public static final String TAG = "chla";
     // Implement MediaPlayer.OnPreparedListener
     @Override
     public void onPrepared(MediaPlayer mp) {
-        Log.d(TAG, "onPrepared: 2");
+        Log.d(TAG, "onPrepared: 1");
         controller.setMediaPlayer(this);
         controller.setAnchorView((FrameLayout) findViewById(R.id.videoSurfaceContainer));
         player.start();
+        progressDialog.dismiss();
         dura.setVisibility(View.VISIBLE);
-        countDownTimer = new CountDownTimer(getDuration(), 1000) {                     //geriye sayma
+        Log.d(TAG, "onPrepared: "+getDuration());
+        int gy=getDuration();
+        countDownTimer = new CountDownTimer(gy, 1000) {                     //geriye sayma
 
             public void onTick(long millisUntilFinished) {
 
@@ -133,6 +139,9 @@ public static final String TAG = "chla";
                 long sec = (millisUntilFinished / 1000) % 60;
 
                 dura.setText(f.format(hour) + ":" + f.format(min) + ":" + f.format(sec));
+               // dura2.setText(f.format(hour) + ":" + f.format(min) + ":" + f.format(sec));
+
+
             }
 
             public void onFinish() {
@@ -335,6 +344,10 @@ public static final String TAG = "chla";
 
         //player = new MediaPlayer();
         try {
+           progressDialog = new ProgressDialog(this);
+            progressDialog.setTitle("Please Wait");
+            progressDialog.setMessage("Loading ... ");
+            progressDialog.show();
 
             player.setAudioStreamType(AudioManager.STREAM_MUSIC);
             // player.setDataSource(this, Uri.parse("http://dl1.n3.23.cdn.perfectgirls.net/mp4/-h29-35Ni7qOjZT7hZGzdA==,1523201699/525/011/525011-full.mp4"));
