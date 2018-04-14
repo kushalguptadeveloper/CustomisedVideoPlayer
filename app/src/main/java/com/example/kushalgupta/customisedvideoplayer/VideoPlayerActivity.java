@@ -1,11 +1,13 @@
 package com.example.kushalgupta.customisedvideoplayer;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -14,6 +16,7 @@ import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -27,7 +30,7 @@ import java.util.Locale;
 public class VideoPlayerActivity extends Activity implements SurfaceHolder.Callback, MediaPlayer.OnPreparedListener, VideoControllerView.MediaPlayerControl {
 
     SurfaceView videoSurface;
-    MediaPlayer player;
+    MediaPlayer player, player2;
     VideoControllerView controller;
     TextView dura;
     private ProgressBar screenProgress;
@@ -36,9 +39,8 @@ public class VideoPlayerActivity extends Activity implements SurfaceHolder.Callb
     Formatter mFormatter;
     private int remainingTime;
     int screenTime;
-CountDownTimer countDownTimer;
-
-
+    CountDownTimer countDownTimer;
+public static final String TAG = "chla";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,112 +52,43 @@ CountDownTimer countDownTimer;
         SurfaceHolder videoHolder = videoSurface.getHolder();
         videoHolder.addCallback(this);
 
-        player = new MediaPlayer();
+        // player = new MediaPlayer();
         controller = new VideoControllerView(this);
-
-
-
-//        screenProgress = (ProgressBar) findViewById(R.id.activity_seekbar);
-//        if (screenProgress != null) {
-//            if (screenProgress instanceof SeekBar) {
-//                SeekBar seeker = (SeekBar) screenProgress;
-//                seeker.setOnSeekBarChangeListener(mSeekListener);
-//            }
-//            screenProgress.setMax(1000);
-//        }
+        startNext();
 //
-//        mFormatBuilder = new StringBuilder();
-//        mFormatter = new Formatter(mFormatBuilder, Locale.getDefault());
-
-        try {
-
-            player.setAudioStreamType(AudioManager.STREAM_MUSIC);
-            // player.setDataSource(this, Uri.parse("http://dl1.n3.23.cdn.perfectgirls.net/mp4/-h29-35Ni7qOjZT7hZGzdA==,1523201699/525/011/525011-full.mp4"));
-
-           player.setDataSource(this, Uri.parse("http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4"));
-            player.setOnPreparedListener(this);
-
-
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        } catch (SecurityException e) {
-            e.printStackTrace();
-        } catch (IllegalStateException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        try {
+//
+//            player.setAudioStreamType(AudioManager.STREAM_MUSIC);
+//             //player.setDataSource(this, Uri.parse("http://dl2.n3.22.cdn.perfectgirls.net/mp4/HkW0SBQNq1yMVYiNUuiiMA==,1523648541/526/180/526180-full.mp4"));
+//
+//            player.setDataSource(this, Uri.parse("http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4"));
+//            player.setOnPreparedListener(this);
+////player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+////    @Override
+////    public void onCompletion(MediaPlayer mediaPlayer) {
+////
+////       startNext();
+////
+////    }
+////});
+//        } catch (IllegalArgumentException e) {
+//            e.printStackTrace();
+//        } catch (SecurityException e) {
+//            e.printStackTrace();
+//        } catch (IllegalStateException e) {
+//            e.printStackTrace();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
     }
 
-//    private SeekBar.OnSeekBarChangeListener mSeekListener = new SeekBar.OnSeekBarChangeListener() {
-//        @Override
-//        public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-//
-//            long duration = getDuration();
-//            long newposition = (duration * i) / 1000L;
-//            //seekTo( (int) newposition);
-//            screenProgress.setProgress((int)newposition);
-//            if (dura != null)
-//                remainingTime = (int)duration-(int)newposition+1000;
-//            dura.setText(stringForTime(remainingTime));
-//
-//        }
-//
-//        public void onStartTrackingTouch(SeekBar bar) {
-//            setPos();
-//
-//            mDragging = true;
-//
-//        }
-//
-//        @Override
-//        public void onStopTrackingTouch(SeekBar seekBar) {
-//            setPos();
-//        }
-//    };
-//
-//    private String stringForTime(int timeMs) {
-//        int totalSeconds = timeMs / 1000;
-//
-//        int seconds = totalSeconds % 60;
-//        int minutes = (totalSeconds / 60) % 60;
-//        int hours   = totalSeconds / 3600;
-//
-////        mFormatBuilder.setLength(0);
-//        if (hours > 0) {
-//            return mFormatter.format("%d:%02d:%02d", hours, minutes, seconds).toString();
-//        } else {
-//            return mFormatter.format("%02d:%02d", minutes, seconds).toString();
-//        }
-//    }
-//
-//    private int setPos(){
-//
-//        int duration = getDuration();
-//        int position = getCurrentPosition();
-//        int rem = duration-position+1000;
-//
-//        if (screenProgress != null) {
-//            if (duration > 0) {
-//                // use long to avoid overflow
-//                long pos = 1000L * position / duration;
-//
-//                screenProgress.setProgress((int) pos);
-//
-//                int percent = getBufferPercentage();
-//                screenProgress.setSecondaryProgress(percent * 10);
-//                dura.setText(stringForTime(rem));
-//            }
-//        }
-//    return position;}
 
-
-            @Override
+    @Override
     public boolean onTouchEvent(MotionEvent event) {
         controller.show();
         player.pause();
         dura.setVisibility(View.INVISIBLE);
-        if(countDownTimer !=null) {
+        if (countDownTimer != null) {
             countDownTimer.cancel();
         }
 
@@ -185,9 +118,11 @@ CountDownTimer countDownTimer;
     // Implement MediaPlayer.OnPreparedListener
     @Override
     public void onPrepared(MediaPlayer mp) {
+        Log.d(TAG, "onPrepared: 2");
         controller.setMediaPlayer(this);
         controller.setAnchorView((FrameLayout) findViewById(R.id.videoSurfaceContainer));
         player.start();
+        dura.setVisibility(View.VISIBLE);
         countDownTimer = new CountDownTimer(getDuration(), 1000) {                     //geriye sayma
 
             public void onTick(long millisUntilFinished) {
@@ -236,7 +171,7 @@ CountDownTimer countDownTimer;
 
     @Override
     public int getDuration() {
-        int dur= player.getDuration();
+        int dur = player.getDuration();
 //        dura.setText(Integer.toString(dur));
         return dur;
     }
@@ -250,7 +185,7 @@ CountDownTimer countDownTimer;
     public void pause() {
 
         dura.setVisibility(View.INVISIBLE);
-        if(countDownTimer !=null){
+        if (countDownTimer != null) {
             countDownTimer.cancel();
         }
         player.pause();
@@ -296,39 +231,131 @@ CountDownTimer countDownTimer;
     }
 
     @Override
-    public void setOnScreenTime(int time){
-       // dura.setText(time);
-        screenTime=time+1000;
+    public void setOnScreenTime(int time) {
+        // dura.setText(time);
+        screenTime = time + 1000;
 
 
     }
+
     @Override
-    public void nextVideo(){
-        if(player !=null){
-            player.stop();
+    public void nextVideo() {
+        if (player != null) {
 
+            startNext();
+
+
+        }
+        //  player.stop();
+//            player.reset();
+//           // player.release();
+//         //   player = null;
+//
+////player=new MediaPlayer();
+//            try {
+//
+//              // Uri u=Uri.parse("http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4");
+//                //player=MediaPlayer.create(this,u);
+//                player = new MediaPlayer();
+//                SurfaceHolder videoHolder = videoSurface.getHolder();
+//                videoHolder.addCallback(this);
+//
+//                controller = new VideoControllerView(this);
+//                player.setAudioStreamType(AudioManager.STREAM_MUSIC);
+//                player.setDataSource(this, Uri.parse("http://www.html5videoplayer.net/videos/toystory.mp4"));
+//                player.setOnPreparedListener(this);
+////                player.prepareAsync();
+//
+//
+//            } catch (IllegalArgumentException e) {
+//                e.printStackTrace();
+//            } catch (SecurityException e) {
+//                e.printStackTrace();
+//            } catch (IllegalStateException e) {
+//                e.printStackTrace();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//
+//        }
+    }
+
+    public void startNext() {
+        if (player == null) {
+            player = new MediaPlayer();
             try {
+             //   player.setAudioStreamType(AudioManager.STREAM_MUSIC);
 
-                player.setAudioStreamType(AudioManager.STREAM_MUSIC);
-                // player.setDataSource(this, Uri.parse("http://dl1.n3.23.cdn.perfectgirls.net/mp4/-h29-35Ni7qOjZT7hZGzdA==,1523201699/525/011/525011-full.mp4"));
-
-                 player.setDataSource(this, Uri.parse("http://dl1.n3.23.cdn.perfectgirls.net/mp4/-h29-35Ni7qOjZT7hZGzdA==,1523201699/525/011/525011-full.mp4"));
-                player.setOnPreparedListener(this);
-
-
-            } catch (IllegalArgumentException e) {
+                player.setDataSource("http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4");
+               // player.setOnPreparedListener(this);
+            } catch (IOException e) {
                 e.printStackTrace();
-            } catch (SecurityException e) {
-                e.printStackTrace();
-            } catch (IllegalStateException e) {
-                e.printStackTrace();
+            }
+        } else {
+            player.reset();
+            try {
+            //    player.setAudioStreamType(AudioManager.STREAM_MUSIC);
+                player.setDataSource("http://www.html5videoplayer.net/videos/toystory.mp4");
+                player.prepareAsync();
+
+
+               // player.setOnPreparedListener(this);
+                // player.setOnPreparedListener(this);
+//                player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+//                    @Override
+//                    public void onPrepared(MediaPlayer mediaPlayer) {
+//                        Log.d(TAG, "onPrepared: chla");
+//                        player.start();
+//                        dura.setVisibility(View.VISIBLE);
+//                        Toast.makeText(VideoPlayerActivity.this, "" + getDuration(), Toast.LENGTH_SHORT).show();
+//                        countDownTimer = new CountDownTimer(getDuration(), 1000) {                     //geriye sayma
+//
+//                            public void onTick(long millisUntilFinished) {
+//
+//                                NumberFormat f = new DecimalFormat("00");
+//                                long hour = (millisUntilFinished / 3600000) % 24;
+//                                long min = (millisUntilFinished / 60000) % 60;
+//                                long sec = (millisUntilFinished / 1000) % 60;
+//
+//                                dura.setText(f.format(hour) + ":" + f.format(min) + ":" + f.format(sec));
+//                            }
+//
+//                            public void onFinish() {
+//                                dura.setText("00:00:00");
+//                            }
+//                        }.start();
+//                    }
+//                });
+
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-        }
 
-    }
+        //player = new MediaPlayer();
+        try {
+
+            player.setAudioStreamType(AudioManager.STREAM_MUSIC);
+            // player.setDataSource(this, Uri.parse("http://dl1.n3.23.cdn.perfectgirls.net/mp4/-h29-35Ni7qOjZT7hZGzdA==,1523201699/525/011/525011-full.mp4"));
+            // player.setDataSource(this, Uri.parse("http://dl2.n3.22.cdn.perfectgirls.net/mp4/HkW0SBQNq1yMVYiNUuiiMA==,1523648541/526/180/526180-full.mp4"));
+
+            //  player.setDataSource(this, Uri.parse("http://dl1.n3.23.cdn.perfectgirls.net/mp4/-h29-35Ni7qOjZT7hZGzdA==,1523201699/525/011/525011-full.mp4"));
+            player.setOnPreparedListener(this);
+
+
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (SecurityException e) {
+            e.printStackTrace();
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+
+        }
+    }}
+
+
+
 
 
 
