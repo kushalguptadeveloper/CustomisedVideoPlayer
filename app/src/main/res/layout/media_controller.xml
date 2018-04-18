@@ -11,7 +11,11 @@
         android:layout_height="100dp"
         android:layout_above="@+id/controller"
         android:background="#07000000"
-        android:text="bla bla bla" />
+        android:textSize="40sp"
+      android:textAppearance="?android:textAppearanceLarge"
+        android:textStyle="bold"
+        android:textColor="#fff"
+        android:gravity="center"/>
 
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/controller"
@@ -63,8 +67,9 @@
                 android:textStyle="bold" />
 
             <TextView
-                android:layout_width="100dp"
-                android:layout_height="20dp"
+                android:id="@+id/time_remaining"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_below="@+id/time_current"
                 android:gravity="center"
                 android:text="Time Remaining"
@@ -113,8 +118,9 @@
                 />
 
             <TextView
-                android:layout_width="110dp"
-                android:layout_height="20dp"
+                android:id="@+id/time_elapsed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_below="@+id/time"
                 android:layout_toRightOf="@+id/ffwd"
                 android:gravity="center"
