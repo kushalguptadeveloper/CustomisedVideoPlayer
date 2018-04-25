@@ -8,6 +8,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Handler;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -20,6 +21,9 @@ import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.daimajia.androidanimations.library.Techniques;
+import com.daimajia.androidanimations.library.YoYo;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -35,7 +39,7 @@ public class VideoPlayerActivity extends Activity implements SurfaceHolder.Callb
     SurfaceView videoSurface;
     MediaPlayer player, player2;
     VideoControllerView controller;
-    TextView dura, dura2,NoOfSets;
+    TextView dura, dura2,NoOfSets,middleCount;
     Boolean count;
     int screenTime,screenTime2;
     CountDownTimer countDownTimer;
@@ -46,6 +50,8 @@ public class VideoPlayerActivity extends Activity implements SurfaceHolder.Callb
     String videoName;
     int IntroReal;
     int videoNo;
+    int currentSet=0;
+    int tottalReps =4;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +62,8 @@ public class VideoPlayerActivity extends Activity implements SurfaceHolder.Callb
         skipIntroBtn = findViewById(R.id.btn_skip_intro);
         skipIntroBtn.setOnClickListener(skipIntriListner);
 NoOfSets = findViewById(R.id.no_of_sets);
+middleCount = findViewById(R.id.countInBetweenScreen);
+
 
         videoSurface = (SurfaceView) findViewById(R.id.videoSurface);
         SurfaceHolder videoHolder = videoSurface.getHolder();
@@ -140,7 +148,13 @@ NoOfSets = findViewById(R.id.no_of_sets);
         Log.d(TAG, "onPrepared: " + getDuration());
         int gy = getDuration();
         if(IntroReal == 1 ){
-            gy = gy * noOfSets;
+            if(videoNo == 0 || videoNo == 1) {
+                gy = gy * noOfSets;
+            }
+            else if(videoNo == 2){
+                gy = gy * tottalReps;
+                noOfSets = tottalReps;
+            }
         }
         if(countDownTimer !=null){
             countDownTimer.cancel();
@@ -163,13 +177,29 @@ NoOfSets = findViewById(R.id.no_of_sets);
                     skipIntroBtn.setVisibility(View.VISIBLE);
                 }
                 else if (IntroReal == 1 ){
-                    dura.setVisibility(View.GONE);
-                    skipIntroBtn.setVisibility(View.GONE);
-                    dura2.setVisibility(View.VISIBLE);
-                    NoOfSets.setVisibility(View.VISIBLE);
-                    NoOfSets.setText("Remaining Sets : " +String.valueOf(noOfSets));
-                    dura.setText(videoName + "\n" + "Starts in " + f.format(hour) + ":" + f.format(min) + ":" + f.format(sec));
-                    dura2.setText("Total Time Remaining : \n" +f.format(hour) + ":" + f.format(min) + ":" + f.format(sec));
+                    if(videoNo == 0 || videoNo == 1) {
+                        dura.setVisibility(View.GONE);
+                        skipIntroBtn.setVisibility(View.GONE);
+                        dura2.setVisibility(View.VISIBLE);
+                        NoOfSets.setVisibility(View.VISIBLE);
+                        NoOfSets.setText("Remaining Sets : " + String.valueOf(noOfSets));
+                        dura.setText(videoName + "\n" + "Starts in " + f.format(hour) + ":" + f.format(min) + ":" + f.format(sec));
+                        dura2.setText("Total Time Remaining : \n" + f.format(hour) + ":" + f.format(min) + ":" + f.format(sec));
+                    }
+                    else {
+                        dura.setVisibility(View.GONE);
+                        skipIntroBtn.setVisibility(View.GONE);
+                        dura2.setVisibility(View.VISIBLE);
+                        NoOfSets.setVisibility(View.VISIBLE);
+                     //   NoOfSets.setText("Remaining Sets : " + String.valueOf(noOfSets));
+                       // dura.setText(videoName + "\n" + "Starts in " + f.format(hour) + ":" + f.format(min) + ":" + f.format(sec));
+                       // dura2.setText("Total Time Remaining : \n" + f.format(hour) + ":" + f.format(min) + ":" + f.format(sec));
+                        dura2.setText(String.valueOf(currentSet)+"/"+String.valueOf(tottalReps));
+                       NoOfSets.setText("Total Time Remaining : \n" + f.format(hour) + ":" + f.format(min) + ":" + f.format(sec));
+
+
+
+                    }
 
                 }
 
@@ -190,6 +220,14 @@ NoOfSets = findViewById(R.id.no_of_sets);
                 else if(IntroReal == 0 && videoNo == 1){
                     IntroReal =1;
                     videoNo =1;
+                }
+                else if(IntroReal ==1 && videoNo == 1){
+                    IntroReal =0;
+                    videoNo=2;
+                }
+                else if(IntroReal == 0 && videoNo == 2){
+                    IntroReal = 1;
+                    videoNo =2;
                 }
                 startNext();
             }
@@ -281,14 +319,29 @@ NoOfSets = findViewById(R.id.no_of_sets);
                     skipIntroBtn.setVisibility(View.VISIBLE);
                 }
                 else if (IntroReal == 1 ){
-                    dura.setVisibility(View.GONE);
-                    skipIntroBtn.setVisibility(View.GONE);
-                    dura2.setVisibility(View.VISIBLE);
-                    NoOfSets.setVisibility(View.VISIBLE);
-                    NoOfSets.setText("Remaining Sets : " +String.valueOf(noOfSets));
-                    dura.setText(videoName + "\n" + "Starts in " + f.format(hour) + ":" + f.format(min) + ":" + f.format(sec));
-                    dura2.setText("Total Time Remaining : \n" +f.format(hour) + ":" + f.format(min) + ":" + f.format(sec));
+                    if(videoNo == 0 || videoNo == 1) {
+                        dura.setVisibility(View.GONE);
+                        skipIntroBtn.setVisibility(View.GONE);
+                        dura2.setVisibility(View.VISIBLE);
+                        NoOfSets.setVisibility(View.VISIBLE);
+                        NoOfSets.setText("Remaining Sets : " + String.valueOf(noOfSets));
+                        dura.setText(videoName + "\n" + "Starts in " + f.format(hour) + ":" + f.format(min) + ":" + f.format(sec));
+                        dura2.setText("Total Time Remaining : \n" + f.format(hour) + ":" + f.format(min) + ":" + f.format(sec));
+                    }
+                    else {
+                        dura.setVisibility(View.GONE);
+                        skipIntroBtn.setVisibility(View.GONE);
+                        dura2.setVisibility(View.VISIBLE);
+                        NoOfSets.setVisibility(View.VISIBLE);
+                        //   NoOfSets.setText("Remaining Sets : " + String.valueOf(noOfSets));
+                        // dura.setText(videoName + "\n" + "Starts in " + f.format(hour) + ":" + f.format(min) + ":" + f.format(sec));
+                        // dura2.setText("Total Time Remaining : \n" + f.format(hour) + ":" + f.format(min) + ":" + f.format(sec));
+                        dura2.setText(String.valueOf(currentSet)+"/"+String.valueOf(tottalReps));
+                        NoOfSets.setText("Total Time Remaining : \n" + f.format(hour) + ":" + f.format(min) + ":" + f.format(sec));
 
+
+
+                    }
                 }
             }
 
@@ -305,6 +358,14 @@ NoOfSets = findViewById(R.id.no_of_sets);
                 else if(IntroReal == 0 && videoNo == 1){
                     IntroReal =1;
                     videoNo =1;
+                }
+                else if(IntroReal ==1 && videoNo == 1){
+                    IntroReal =0;
+                    videoNo=2;
+                }
+                else if(IntroReal == 0 && videoNo == 2){
+                    IntroReal = 1;
+                    videoNo =2;
                 }
                 startNext();
             }
@@ -354,6 +415,15 @@ NoOfSets = findViewById(R.id.no_of_sets);
                 IntroReal =1;
                 videoNo =1;
             }
+
+            else if(IntroReal ==1 && videoNo == 1){
+                IntroReal =0;
+                videoNo=2;
+            }
+            else if(IntroReal == 0 && videoNo == 2){
+                IntroReal = 1;
+                videoNo =2;
+            }
             startNext();
 
 
@@ -399,17 +469,26 @@ NoOfSets = findViewById(R.id.no_of_sets);
 
             if(IntroReal == 0 && videoNo == 0){
                 IntroReal = 0;
-                videoNo =1;
+                videoNo =2;
             }
             else if(IntroReal == 1 && videoNo == 0){
                 IntroReal = 0;
-                videoNo =0;
+                videoNo =2;
             }
             else if(IntroReal == 0 && videoNo == 1){
                 IntroReal =0;
                 videoNo =0;
             }
             else if(IntroReal == 1 && videoNo == 1){
+                IntroReal = 0;
+                videoNo = 0;
+            }
+
+            else if(IntroReal == 0 && videoNo == 2){
+                IntroReal =0;
+                videoNo =1;
+            }
+            else if(IntroReal == 1 && videoNo == 2){
                 IntroReal = 0;
                 videoNo = 1;
             }
@@ -485,6 +564,45 @@ NoOfSets = findViewById(R.id.no_of_sets);
                 e.printStackTrace();
             }
 
+
+
+        }
+
+
+        else if(IntroReal == 0 && videoNo == 2) {
+            player.reset();
+            try {
+                videoName = "Big Buck Bunny";
+                IntroReal = 0;
+                videoNo = 2;
+                if (countDownTimer != null) {
+                    countDownTimer.cancel();
+                }
+                player.setDataSource("http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4");
+                player.prepareAsync();
+
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        else if(IntroReal == 1 && videoNo == 2) {
+            player.reset();
+            try {
+                videoName = "Big Buck Bunny";
+                IntroReal = 1;
+                videoNo = 2;
+                if (countDownTimer != null) {
+                    countDownTimer.cancel();
+                }
+                player.setDataSource("http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4");
+                player.prepareAsync();
+
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         try {
@@ -511,29 +629,59 @@ NoOfSets = findViewById(R.id.no_of_sets);
     @Override
     public void onCompletion(MediaPlayer mediaPlayer) {
 if(IntroReal == 1) {
-    if(noOfSets > 0) {
-        player.seekTo(0);
-        player.start();
-        noOfSets--;
-    }
-    else {
+    if(videoNo == 0 || videoNo == 1) {
+        if (noOfSets > 0) {
+            player.seekTo(0);
+            player.start();
+            noOfSets--;
+        } else {
 
-        if(IntroReal == 1 && videoNo == 0){
+            if (IntroReal == 1 && videoNo == 0) {
+                IntroReal = 0;
+                videoNo = 1;
+                noOfSets = 2;
+                startNext();
+            }
+
+            if (IntroReal == 1 && videoNo == 1) {
+                IntroReal = 0;
+                videoNo = 2;
+                noOfSets = 2;
+                currentSet = 0;
+                startNext();
+            }
+
+
+        }
+    }
+    else if(videoNo == 2){
+        if(currentSet < tottalReps){
+            player.seekTo(0);
+            player.start();
+            currentSet = currentSet+1;
+            noOfSets--;
+            middleCount.setVisibility(View.VISIBLE);
+            middleCount.setText(String.valueOf(currentSet));
+            YoYo.with(Techniques.ZoomIn).duration(2000).playOn(middleCount);
+            YoYo.with(Techniques.FadeOut).duration(1000).delay(2000).playOn(middleCount);
+           // middleCount.setVisibility(View.INVISIBLE);
+
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    middleCount.setVisibility(View.INVISIBLE);
+
+                }
+            }, 3000);
+
+        }
+        else {
             IntroReal = 0;
-            videoNo =1;
-            noOfSets =2;
+            videoNo = 0;
+            currentSet =0 ;
+            noOfSets = 2;
             startNext();
         }
-
-        if(IntroReal == 1 && videoNo == 1){
-           IntroReal =0;
-           videoNo =0;
-           noOfSets =2;
-           startNext();
-        }
-
-
-
     }
 
 }
@@ -549,6 +697,11 @@ if(IntroReal == 1) {
             IntroReal =1;
             videoNo =1;
             startNext();
+        }
+        if(IntroReal ==0 && videoNo == 2){
+    IntroReal =1;
+    videoNo =2;
+    startNext();
         }
     //    startNext();
 
@@ -566,6 +719,10 @@ if(IntroReal == 1) {
             else if(videoNo == 1){
                 IntroReal =1;
                 videoNo =1;
+            }
+            else if(videoNo == 2){
+                IntroReal =1;
+                videoNo =2;
             }
             startNext();
         }
